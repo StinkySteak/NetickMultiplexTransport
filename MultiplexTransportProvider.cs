@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Netick.Transport
 {
-    [CreateAssetMenu(fileName = "NetickMultiplexTransport", menuName = "Netick/Transport/NetickMultiplexTransport", order = 1)]
-    public class NetickMultiplexTransportProvider : NetworkTransportProvider
+    [CreateAssetMenu(fileName = "MultiplexTransportProvider", menuName = "Netick/Transport/MultiplexTransportProvider", order = 1)]
+    public class MultiplexTransportProvider : NetworkTransportProvider
     {
         [SerializeField] private NetworkTransportProvider[] _transports;
         [SerializeField] private int _portOffsetPerTransport = 10;
@@ -13,7 +13,7 @@ namespace Netick.Transport
 
         public override NetworkTransport MakeTransportInstance()
         {
-            NetickMultiplexTransport multiplex = new NetickMultiplexTransport();
+            MultiplexTransport multiplex = new MultiplexTransport();
             multiplex._portOffsetPerTransport = _portOffsetPerTransport;
             multiplex._transports = new NetworkTransport[_transports.Length];
             multiplex._clientTransportIndex = ClientTransportIndex;
@@ -30,7 +30,7 @@ namespace Netick.Transport
             return multiplex;
         }
 
-        internal class NetickMultiplexTransport : NetworkTransport
+        internal class MultiplexTransport : NetworkTransport
         {
             internal NetworkTransport[] _transports;
             internal int _portOffsetPerTransport = 10;
@@ -89,7 +89,7 @@ namespace Netick.Transport
                 foreach (NetworkTransport transport in _transports)
                 {
                     transport.Run(mode, nextPort);
-                    Debug.Log($"[{nameof(NetickMultiplexTransport)}] Running {transport} on {nextPort}");
+                    Debug.Log($"[{nameof(MultiplexTransport)}] Running {transport} on {nextPort}");
 
                     nextPort += _portOffsetPerTransport;
                 }
