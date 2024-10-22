@@ -1,0 +1,7 @@
+{
+  "name": "com.stinkysteak.multiplextransportnetick",
+  "version": "0.1.0",
+  "displayName": "Multiplex Transport for Netick",
+  "description": "Allow developer to combine multiple transport",
+  "unity": "2021.3"
+}

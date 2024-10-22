@@ -1,0 +1,19 @@
+{
+    "name": "NetickMultiplexTransport",
+    "rootNamespace": "",
+    "references": [
+        "GUID:03058786646e84a4587858e9302c3f41"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Netick.dll",
+        "Netick.Unity.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
