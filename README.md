@@ -6,6 +6,10 @@ This is a good use case if you want to connect using UDP for your desktop or mob
 
 Please note that Transport A and Transport B cannot listen to the same port. The 2nd protocol or more port will be determined by `PortOffsetPerTransport`
 
+| Feature   	| Status 	|
+|-----------	|--------	|
+| Multiplex 	| Beta   	|
+
 ## Installation
 
 ### Prerequisites
