@@ -52,20 +52,67 @@ namespace Netick.Transport
                     MethodInfo internalInit = transport.GetType().GetMethod("_Init", BindingFlags.NonPublic | BindingFlags.Instance);
 
                     internalInit.Invoke(transport, parameters);
-                    transport.Init();
                 }
             }
 
             public override void Connect(string address, int port, byte[] connectionData, int connectionDataLength)
             {
-                foreach (NetworkTransport transport in _transports)
-                    transport.Connect(address, port, connectionData, connectionDataLength);
+                if (TryGetClientTransport(out NetworkTransport transport))
+                {
+                    int clientPortOffset = _portOffsetPerTransport * _clientTransportIndex;
+                    int clientPort = port + clientPortOffset;
+
+                    Debug.Log($"[{nameof(MultiplexTransport)}]: Connecting client using {transport} to: {clientPort}");
+                    transport.Connect(address, clientPort, connectionData, connectionDataLength);
+                }
+            }
+
+            private bool TryGetClientTransport(out NetworkTransport networkTransport)
+            {
+                bool isOutOfBounds = _clientTransportIndex < 0 || _clientTransportIndex >= _transports.Length;
+
+                if (isOutOfBounds)
+                {
+                    Debug.LogError($"[{nameof(MultiplexTransport)}] Failed to get client transport, index is out of bounds");
+                    networkTransport = null;
+                    return false;
+                }
+
+                NetworkTransport transport = _transports[_clientTransportIndex];
+                networkTransport = transport;
+                return true;
             }
 
             public override void Disconnect(TransportConnection connection)
             {
+                if (Engine.IsClient)
+                {
+                    if (TryGetClientTransport(out NetworkTransport transport))
+                        transport.Disconnect(connection);
+
+                    return;
+                }
+
                 foreach (NetworkTransport transport in _transports)
-                    transport.Disconnect(connection);
+                {
+                    //Debug.Log($"[{nameof(MultiplexTransport)}]: {transport} Disconnecting: {connection}");
+                    bool hasException = false;
+
+                    try
+                    {
+                        transport.Disconnect(connection);
+                    }
+                    catch (System.Exception)
+                    {
+                        hasException = true;
+                        Debug.LogWarning($"[{nameof(MultiplexTransport)}]: Disconnection failed: trying to disconnect: {connection} from: {transport}");
+                    }
+
+                    if (!hasException)
+                    {
+                        break;
+                    }
+                }
             }
 
             public override void PollEvents()
@@ -78,27 +125,39 @@ namespace Netick.Transport
             {
                 if (mode == RunMode.Client)
                 {
-                    NetworkTransport transport = _transports[_clientTransportIndex];
-
-                    transport.Run(mode, port);
+                    RunClient(port);
                     return;
                 }
 
+                RunServer(port);
+            }
 
-                int nextPort = port;
+            private void RunClient(int port)
+            {
+                if (TryGetClientTransport(out NetworkTransport transport))
+                    transport.Run(RunMode.Client, port);
+            }
+
+            private void RunServer(int port)
+            {
+                int serverPort = port;
+
                 foreach (NetworkTransport transport in _transports)
                 {
-                    transport.Run(mode, nextPort);
-                    Debug.Log($"[{nameof(MultiplexTransport)}] Running {transport} on {nextPort}");
+                    Debug.Log($"[{nameof(MultiplexTransport)}]: Running server {transport} on {serverPort}");
+                    transport.Run(RunMode.Server, serverPort);
 
-                    nextPort += _portOffsetPerTransport;
+                    serverPort += _portOffsetPerTransport;
                 }
             }
 
             public override void Shutdown()
             {
                 foreach (NetworkTransport transport in _transports)
+                {
+                    Debug.Log($"[{nameof(MultiplexTransport)}]: shutdown: {transport} isServer: {Engine.IsServer}");
                     transport.Shutdown();
+                }
             }
         }
     }
