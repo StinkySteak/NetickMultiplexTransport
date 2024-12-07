@@ -11,6 +11,8 @@ namespace Netick.Transport
         [SerializeField] private int _portOffsetPerTransport = 10;
         public int ClientTransportIndex;
 
+        public NetworkTransportProvider[] Transports => _transports;
+
         public override NetworkTransport MakeTransportInstance()
         {
             MultiplexTransport multiplex = new MultiplexTransport();
