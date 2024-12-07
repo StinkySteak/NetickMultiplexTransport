@@ -26,3 +26,18 @@ https://github.com/NetickNetworking/NetickForUnity
 - Select Add package from git URL
 - Enter https://github.com/StinkySteak/NetickMultiplexTransport.git
 - You can then create an instance by by double clicking in the Assets folder and going to `Create > Netick > Transport > MultiplexTransportProvider`
+
+### How to Use?
+The MultiplexTransport has several parameters
+
+#### Server
+- Populate the choice of your transport to the Multiplex
+- Port Offset will be used to set the 2nd, or 3rd transport to avoid socket collision
+
+#### Client
+There are 2 available ways to connect to a server that is running on a multiplex transport.
+
+|                      	| Manual                                                       	| Auto                                                                                      	|
+|----------------------	|--------------------------------------------------------------	|-------------------------------------------------------------------------------------------	|
+| Transport            	| Corresponding Transport (e.g LiteNetLib)                     	| using Multiplex                                                                           	|
+| Port Number Choosing 	| Required to figure out matching port as the client transport 	| Auto however, can be mismatched, if server and client build multiplex config is different 	|
